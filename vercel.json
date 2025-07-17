@@ -4,6 +4,7 @@
     { "src": "api/mimo.py", "use": "@vercel/python" }
   ],
   "routes": [
-    { "src": "/api/mimo", "dest": "api/mimo.py" }
+    { "src": "/api/mimo", "dest": "api/mimo.py" },
+    { "src": "/(.*)", "dest": "/index.html" }
   ]
 }
