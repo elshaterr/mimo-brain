@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+  <meta charset="UTF-8">
+  <title>ميمو - مساعدك الذكي</title>
+</head>
+<body>
+  <h1>أهلاً بيك في ميمو</h1>
+  <input id="prompt" placeholder="اسأل ميمو..." />
+  <button onclick="send()">اسأل</button>
+  <pre id="response"></pre>
+
+  <script>
+    async function send() {
+      const prompt = document.getElementById('prompt').value;
+      const res = await fetch('/api/mimo', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({prompt})
+      });
+      const data = await res.json();
+      document.getElementById('response').innerText = data.reply;
+    }
+  </script>
+</body>
+</html>
