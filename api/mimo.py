@@ -1,15 +1,35 @@
 from flask import Flask, request, jsonify
-import google.generativeai as genai
-import os
+from flask_cors import CORS
+import requests
 
 app = Flask(__name__)
+CORS(app)
 
-genai.configure(api_key=os.environ["GEMINI_API_KEY"])
+GEMINI_API_KEY = "AIzaSyBN4HDN3tAsC3NPayscGEXwDEkSVtumarY"
 
-@app.route("/", methods=["POST"])
+@app.route("/api/mimo", methods=["POST"])
 def chat():
-    data = request.get_json()
-    prompt = data.get("prompt", "")
-    model = genai.GenerativeModel("gemini-pro")
-    response = model.generate_content(prompt)
-    return jsonify({"reply": response.text})
+    data = request.json
+    user_message = data.get("message", "")
+
+    if not user_message:
+        return jsonify({"response": "برجاء إدخال رسالة."})
+
+    url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent"
+    headers = {"Content-Type": "application/json"}
+    payload = {"contents": [{"parts": [{"text": user_message}]}]}
+
+    response = requests.post(
+        url + f"?key={GEMINI_API_KEY}",
+        headers=headers,
+        json=payload
+    )
+
+    if response.status_code == 200:
+        reply = response.json()['candidates'][0]['content']['parts'][0]['text']
+        return jsonify({"response": reply})
+    else:
+        return jsonify({"response": "حدث خطأ أثناء الاتصال بـ Gemini."})
+
+if __name__ == "__main__":
+    app.run()
